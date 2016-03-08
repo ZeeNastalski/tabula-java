@@ -23,6 +23,7 @@ import technology.tabula.detectors.NurminenDetectionAlgorithm;
 import technology.tabula.detectors.SpreadsheetDetectionAlgorithm;
 import technology.tabula.extractors.BasicExtractionAlgorithm;
 import technology.tabula.extractors.SpreadsheetExtractionAlgorithm;
+import technology.tabula.writers.AuctionsCSVWriter;
 import technology.tabula.writers.CSVWriter;
 import technology.tabula.writers.JSONWriter;
 import technology.tabula.writers.TSVWriter;
@@ -195,6 +196,10 @@ public class CommandLineApp {
         case TSV:
             writer = new TSVWriter();
             break;
+        case AuctionsCSV:
+            writer = new AuctionsCSVWriter();
+            break;
+        
         }
         writer.write(out, tables);
     }
@@ -280,7 +285,8 @@ public class CommandLineApp {
     private enum OutputFormat {
         CSV,
         TSV,
-        JSON;
+        JSON,
+        AuctionsCSV;
         
         static String[] formatNames() {
             OutputFormat[] values = OutputFormat.values();
