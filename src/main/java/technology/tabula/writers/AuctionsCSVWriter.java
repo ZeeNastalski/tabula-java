@@ -2,6 +2,7 @@ package technology.tabula.writers;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,9 +17,8 @@ import technology.tabula.Table;
 
 /*
  * This class implements an algorithm for processing tables specific to
- * Australian Auction Results pdf file available at 
+ * Australian Auction Results pdf files available at 
  * http://www.domain.com.au/auction-results
- * 
  */
 public class AuctionsCSVWriter extends CSVWriter {
     
@@ -32,17 +32,30 @@ public class AuctionsCSVWriter extends CSVWriter {
         super();
     }
     
+    
+    private Date parseDate(String rowString) throws ParseException
+    {
+        DateFormat format = new SimpleDateFormat("E d MMMM yyyy", Locale.ENGLISH);
+        
+        // remove the th, nd, st if they are next to a digit or two 
+        String dateRow = rowString.replaceFirst("(\\d\\d?)..", "$1");
+        Date parsedDate = format.parse(dateRow);
+        dateString = rowString;
+        
+        return parsedDate;
+    }
+    
+    
     @Override
     public void write(Appendable out, Table table) throws IOException {
         
         this.createWriter(out);
         
 
-        DateFormat format = new SimpleDateFormat("E d MMMM yyyy", Locale.ENGLISH);
+       
         DateFormat outFormat = new SimpleDateFormat("dd/MM/yyyy");
         ArrayList<List<String>> rows = new ArrayList<List<String>>(); 
-        
-        
+           
  
         for (List<RectangularTextContainer> row: table.getRows()) {
             List<String> cells = new ArrayList<String>(row.size());
@@ -72,12 +85,9 @@ public class AuctionsCSVWriter extends CSVWriter {
             {
                 //try to parse date
                 try {
-                    // remove the th, nd, st if they are next to a digit or two 
-                    String dateRow = rowString.replaceFirst("(\\d\\d?)..", "$1");
-                    date = format.parse(dateRow);
-                    dateString = rowString;
+                    this.date = parseDate(rowString);
                     continue;
-                }catch (Exception e) {};
+                }catch (ParseException e) {};
             }
 
 
@@ -102,9 +112,7 @@ public class AuctionsCSVWriter extends CSVWriter {
                 cellsArray.addAll(cells);
                 
                 rows.add(cellsArray); 
-                
-               
-               
+   
             }
             
             //merge rows broken to multiple lines into single line
